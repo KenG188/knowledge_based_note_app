@@ -219,7 +219,7 @@
         "Typecheck passes"
       ],
       "priority": 12,
-      "passes": false,
+      "passes": true,
       "notes": "Simple housekeeping task. Check existing .gitignore before adding entries."
     },
     {
