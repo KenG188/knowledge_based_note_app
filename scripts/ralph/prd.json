@@ -55,7 +55,7 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
+      "passes": true,
       "notes": "Split by /\\n(?=# |\\n)/ regex to handle both paragraph breaks and markdown headers as chunk boundaries."
     },
     {

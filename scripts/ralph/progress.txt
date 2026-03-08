@@ -32,6 +32,19 @@ Started: 2026-03-08
   - vitest.config.mts works perfectly for ESM
 ---
 
+## 2026-03-08 - US-003
+- Created src/lib/chunker.ts with chunkText(text, options?) function
+- Options: maxChunkSize (default 1000), overlap (default 100)
+- Short text returns as single chunk; long text splits on paragraph/header boundaries
+- Falls back to splitBySize() when no paragraph boundaries exist
+- Created src/lib/__tests__/chunker.test.ts with 4 tests, all passing
+- Files changed: src/lib/chunker.ts (new), src/lib/__tests__/chunker.test.ts (new)
+- **Learnings for future iterations:**
+  - `slice(-0)` returns the full string (0 === -0), so always guard overlap > 0 before using it
+  - When overlap >= maxChunkSize, the loop never advances — clamp effectiveOverlap to maxChunkSize - 1
+  - `/\n(?=# |\n)/` splits on double-newlines and markdown headers correctly
+---
+
 ## 2026-03-08 - US-002
 - Created src/app/api/notes/route.ts: GET (all or search with ?q=), POST (create, status 201)
 - Created src/app/api/notes/[id]/route.ts: GET single, PUT update, DELETE
