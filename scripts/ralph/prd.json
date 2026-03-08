@@ -236,7 +236,7 @@
         "Typecheck passes"
       ],
       "priority": 13,
-      "passes": false,
+      "passes": true,
       "notes": "next-themes works by setting a class on the html element. Tailwind v4 may handle dark mode differently — check tailwind config. Use 'suppressHydrationWarning' on html element in layout.tsx."
     },
     {

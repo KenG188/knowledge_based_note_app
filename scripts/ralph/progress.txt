@@ -21,6 +21,20 @@ Started: 2026-03-08
 - data/ directory exists for SQLite database
 ---
 
+## 2026-03-08 - US-013
+- Installed next-themes
+- Created src/components/ThemeProvider.tsx wrapping NextThemesProvider
+- Created src/components/ThemeToggle.tsx with Sun/Moon icon button (uses resolvedTheme to handle SSR)
+- Updated src/app/layout.tsx: ThemeProvider with attribute='class', defaultTheme='system', suppressHydrationWarning on html element
+- Added ThemeToggle to main page header in src/app/page.tsx
+- Typecheck passes, committed
+- Files changed: src/components/ThemeProvider.tsx (new), src/components/ThemeToggle.tsx (new), src/app/layout.tsx, src/app/page.tsx, package.json
+- **Learnings for future iterations:**
+  - Use `resolvedTheme` (not `theme`) for the toggle logic to handle 'system' default correctly
+  - Tailwind v4 handles dark mode via `.dark` class on html by default — no config change needed
+  - suppressHydrationWarning on html element prevents mismatch warning from next-themes
+---
+
 ## 2026-03-08 - US-001
 - Deleted vitest.config.ts, created vitest.config.mts for ESM compatibility
 - Added closeDb() to src/lib/db.ts to reset singleton between tests
