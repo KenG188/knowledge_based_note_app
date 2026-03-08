@@ -146,7 +146,7 @@
         "Typecheck passes"
       ],
       "priority": 8,
-      "passes": false,
+      "passes": true,
       "notes": "Tiptap starter-kit includes bold, italic, lists, headings, etc. The onSave prop should accept { title, content, tags } object."
     },
     {

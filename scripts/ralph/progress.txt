@@ -103,3 +103,17 @@ Started: 2026-03-08
   - Input and Badge can be simple Tailwind wrappers without any third-party primitive
   - Button from @base-ui/react supports size="icon-xs" for small icon buttons (defined in buttonVariants)
 ---
+
+## 2026-03-08 - US-008
+- Installed @tiptap/react @tiptap/starter-kit @tiptap/extension-placeholder
+- Created src/components/Editor.tsx with title input, Tiptap editor, tag input (Enter to add, X to remove)
+- Ctrl+S / Cmd+S global keydown triggers onSave callback; Save button also triggers it
+- Shows "Last saved HH:MM:SS" after save, or "Unsaved changes" otherwise
+- Shows placeholder ("Select a note or create a new one") when no note selected
+- Typecheck passes, committed
+- Files changed: src/components/Editor.tsx (new), package.json, package-lock.json
+- **Learnings for future iterations:**
+  - Tiptap useEffect for syncing note content: key off `note?.id` not the whole note object to avoid infinite loops
+  - Use globalThis.KeyboardEvent type when adding window event listeners in TypeScript
+  - Tiptap EditorContent renders a div; wrap in overflow-y-auto container for scrollability
+---
