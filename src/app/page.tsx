@@ -1,65 +1,111 @@
-import Image from "next/image";
+'use client'
+
+import { useState, useCallback } from 'react'
+import { MessageSquare, Settings } from 'lucide-react'
+import Link from 'next/link'
+import type { Note } from '@/lib/db'
+import { useNotes } from '@/lib/hooks'
+import { NoteList } from '@/components/NoteList'
+import { Editor } from '@/components/Editor'
+import { ChatPanel } from '@/components/ChatPanel'
+import { Button } from '@/components/ui/button'
 
 export default function Home() {
+  const { notes, searchQuery, setSearchQuery, createNote, deleteNote } = useNotes()
+  const [selectedNote, setSelectedNote] = useState<Note | null>(null)
+  const [showChat, setShowChat] = useState(false)
+
+  const handleNewNote = useCallback(async () => {
+    const note = await createNote()
+    if (note) setSelectedNote(note)
+  }, [createNote])
+
+  const handleSelectNote = useCallback((note: Note) => {
+    setSelectedNote(note)
+  }, [])
+
+  const handleDeleteNote = useCallback(async (id: number) => {
+    await deleteNote(id)
+    if (selectedNote?.id === id) setSelectedNote(null)
+  }, [deleteNote, selectedNote])
+
+  const handleSelectNoteById = useCallback((noteId: number) => {
+    const note = notes.find((n) => n.id === noteId)
+    if (note) setSelectedNote(note)
+  }, [notes])
+
+  const handleSave = useCallback(async (data: { title: string; content: string; tags: string[] }) => {
+    if (!selectedNote) return
+    try {
+      await fetch(`/api/notes/${selectedNote.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+      // Fire-and-forget embed (don't block save UX)
+      const openaiKey = typeof window !== 'undefined' ? localStorage.getItem('openai_api_key') : null
+      fetch(`/api/notes/${selectedNote.id}/embed`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ apiKey: openaiKey ?? undefined }),
+      }).catch(() => {/* ignore embed errors */})
+
+      // Update local note state
+      setSelectedNote((prev) => prev ? { ...prev, ...data } : prev)
+    } catch (err) {
+      console.error('Failed to save note:', err)
+    }
+  }, [selectedNote])
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="flex flex-col h-screen bg-background text-foreground">
+      {/* Header */}
+      <header className="flex items-center justify-between px-4 py-2 border-b border-border shrink-0">
+        <h1 className="text-base font-semibold">Knowledge Base</h1>
+        <div className="flex items-center gap-2">
+          <Button
+            size="icon-sm"
+            variant={showChat ? 'default' : 'ghost'}
+            onClick={() => setShowChat((v) => !v)}
+            title="Toggle AI Chat"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <MessageSquare className="size-4" />
+          </Button>
+          <Link href="/settings">
+            <Button size="icon-sm" variant="ghost" title="Settings">
+              <Settings className="size-4" />
+            </Button>
+          </Link>
         </div>
-      </main>
+      </header>
+
+      {/* Three-panel layout */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Left: Note list sidebar (~280px) */}
+        <div className="w-[280px] shrink-0 overflow-hidden">
+          <NoteList
+            notes={notes}
+            selectedNoteId={selectedNote?.id ?? null}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            onSelectNote={handleSelectNote}
+            onNewNote={handleNewNote}
+            onDeleteNote={handleDeleteNote}
+          />
+        </div>
+
+        {/* Center: Editor */}
+        <div className="flex-1 overflow-hidden flex flex-col">
+          <Editor note={selectedNote} onSave={handleSave} />
+        </div>
+
+        {/* Right: AI Chat panel (toggleable) */}
+        {showChat && (
+          <div className="w-[360px] shrink-0 overflow-hidden">
+            <ChatPanel onSelectNote={handleSelectNoteById} />
+          </div>
+        )}
+      </div>
     </div>
-  );
+  )
 }
