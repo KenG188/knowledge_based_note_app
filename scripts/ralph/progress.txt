@@ -45,6 +45,18 @@ Started: 2026-03-08
   - `/\n(?=# |\n)/` splits on double-newlines and markdown headers correctly
 ---
 
+## 2026-03-08 - US-004
+- Created src/lib/embedding.ts with getEmbedding(text, apiKey?) and getEmbeddings(texts[], apiKey?) using OpenAI text-embedding-3-small
+- Created src/lib/rag.ts with cosineSimilarity(), indexNote(noteId, apiKey?), searchSimilar(query, topK, apiKey?)
+- indexNote() chunks content, generates embeddings, stores as Float64Array BLOB in note_chunks table
+- searchSimilar() deserializes BLOB embeddings, scores with cosineSimilarity, returns top K results
+- Created src/lib/__tests__/rag.test.ts with 3 tests (identical, orthogonal, opposite vectors) — all pass
+- Files changed: src/lib/embedding.ts (new), src/lib/rag.ts (new), src/lib/__tests__/rag.test.ts (new)
+- **Learnings for future iterations:**
+  - Float64Array stored as Buffer in SQLite BLOB; read back with `new Float64Array(buf.buffer, buf.byteOffset, buf.byteLength / 8)`
+  - Unit tests for cosineSimilarity don't need API mocking — pure math tests
+---
+
 ## 2026-03-08 - US-002
 - Created src/app/api/notes/route.ts: GET (all or search with ?q=), POST (create, status 201)
 - Created src/app/api/notes/[id]/route.ts: GET single, PUT update, DELETE

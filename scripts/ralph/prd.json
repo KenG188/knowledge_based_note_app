@@ -73,7 +73,7 @@
         "Typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
+      "passes": true,
       "notes": "Embeddings stored as Float64Array serialized to Buffer/BLOB in SQLite. cosineSimilarity tests can use static vectors without calling OpenAI API. The API key can come from process.env.OPENAI_API_KEY or a passed parameter."
     },
     {
