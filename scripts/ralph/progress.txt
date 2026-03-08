@@ -122,6 +122,19 @@ Started: 2026-03-08
   - `size="icon-sm"` works for the send button (matches NoteList pattern)
 ---
 
+## 2026-03-08 - US-011
+- Created src/app/settings/page.tsx with Anthropic and OpenAI API key fields
+- Show/hide toggle for each password input using Eye/EyeOff icons from lucide-react
+- Keys saved to localStorage on Save button click; loaded from localStorage on mount
+- "Saved!" feedback shown for 2 seconds after save
+- Settings link (gear icon) in main page header navigates to /settings
+- Typecheck passes, committed
+- Files changed: src/app/settings/page.tsx (new)
+- **Learnings for future iterations:**
+  - ApiKeyField component pattern: self-contained field with local state, reads/writes localStorage directly
+  - Use `&apos;` in JSX for apostrophes to avoid lint warnings
+---
+
 ## 2026-03-08 - US-010
 - Updated src/app/page.tsx with three-panel layout (NoteList sidebar 280px, Editor center, ChatPanel 360px toggle)
 - Header shows 'Knowledge Base' title, AI Chat toggle button (MessageSquare), and Settings link (gear icon)
