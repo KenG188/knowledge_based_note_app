@@ -11,6 +11,7 @@ Started: 2026-03-08
 - Package manager: npm
 - Test command: npx vitest run (or npm test after adding script)
 - Typecheck command: npx tsc --noEmit
+- DB singleton requires closeDb() call in test afterEach before deleting DB file, otherwise old connection persists and data leaks between tests
 
 ## Project State
 - Task 1 (Project Scaffolding): COMPLETE — Next.js 15, TypeScript, Tailwind v4, shadcn/ui button installed
@@ -18,4 +19,15 @@ Started: 2026-03-08
 - vitest and @vitejs/plugin-react installed in devDependencies
 - lucide-react already installed
 - data/ directory exists for SQLite database
+---
+
+## 2026-03-08 - US-001
+- Deleted vitest.config.ts, created vitest.config.mts for ESM compatibility
+- Added closeDb() to src/lib/db.ts to reset singleton between tests
+- Updated db.test.ts to import and call closeDb() in afterEach
+- All 7 DB tests pass, typecheck clean
+- Files changed: vitest.config.mts (new), src/lib/db.ts, src/lib/__tests__/db.test.ts
+- **Learnings for future iterations:**
+  - DB singleton persists across tests — must close before deleting test DB file
+  - vitest.config.mts works perfectly for ESM
 ---

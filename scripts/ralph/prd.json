@@ -18,7 +18,7 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
+      "passes": true,
       "notes": "vitest.config MUST use .mts extension — vite 7 dropped CJS, so vitest.config.ts fails with ERR_REQUIRE_ESM. Files may already exist from a previous attempt: check src/lib/db.ts and src/lib/__tests__/db.test.ts and vitest.config.ts. If vitest.config.ts exists, delete it and create vitest.config.mts instead. The db module uses a singleton with path-change detection to support testing with different DB_PATH env vars."
     },
     {
