@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { getDb, createNote, getNote, getAllNotes, updateNote, deleteNote, searchNotes } from '../db'
+import { getDb, createNote, getNote, getAllNotes, updateNote, deleteNote, searchNotes, closeDb } from '../db'
 import fs from 'fs'
 import path from 'path'
 
@@ -12,7 +12,8 @@ describe('Database', () => {
   })
 
   afterEach(() => {
-    // Clean up test database
+    // Close DB connection before deleting file
+    closeDb()
     if (fs.existsSync(TEST_DB_PATH)) {
       fs.unlinkSync(TEST_DB_PATH)
     }

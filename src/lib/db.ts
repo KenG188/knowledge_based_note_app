@@ -115,6 +115,14 @@ export function deleteNote(id: number): void {
   db.prepare('DELETE FROM notes WHERE id = ?').run(id)
 }
 
+export function closeDb(): void {
+  if (db) {
+    db.close()
+    db = null
+    currentDbPath = null
+  }
+}
+
 export function searchNotes(query: string): Note[] {
   const db = getDb()
   const pattern = `%${query}%`
