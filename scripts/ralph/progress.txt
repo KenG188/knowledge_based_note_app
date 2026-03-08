@@ -91,3 +91,15 @@ Started: 2026-03-08
 - **Learnings for future iterations:**
   - Wrap request.json() in try/catch when the body is optional — avoids runtime error on empty body
 ---
+
+## 2026-03-08 - US-007
+- Created src/lib/hooks.ts with useNotes() custom hook (debounced search 300ms, fetch, create, delete)
+- Created src/components/ui/input.tsx and badge.tsx as simple Tailwind-based components (no @radix-ui needed)
+- Created src/components/NoteList.tsx with search input, New Note button, note list with title/date/tags, delete button per item
+- Typecheck passes, committed
+- Files changed: src/lib/hooks.ts (new), src/components/NoteList.tsx (new), src/components/ui/input.tsx (new), src/components/ui/badge.tsx (new)
+- **Learnings for future iterations:**
+  - Project uses @base-ui/react instead of @radix-ui — no ScrollArea from radix available; used plain overflow-y-auto div instead
+  - Input and Badge can be simple Tailwind wrappers without any third-party primitive
+  - Button from @base-ui/react supports size="icon-xs" for small icon buttons (defined in buttonVariants)
+---
