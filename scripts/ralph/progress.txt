@@ -104,6 +104,37 @@ Started: 2026-03-08
   - Button from @base-ui/react supports size="icon-xs" for small icon buttons (defined in buttonVariants)
 ---
 
+## 2026-03-08 - US-009
+- Created src/components/ChatPanel.tsx with SSE streaming chat panel
+- Shows conversation history (user/assistant messages) with auto-scroll
+- Uses fetch + ReadableStream to stream SSE from /api/chat (POST)
+- Parses `data: {type:'text'}` and `data: {type:'sources'}` events
+- Streaming text accumulates in real-time in last assistant message
+- Sources displayed as clickable citations with FileText icon after stream ends
+- Loading spinner shown in assistant bubble while waiting
+- Accepts onSelectNote(noteId) callback for source citation navigation
+- API keys read from localStorage (anthropic_api_key, openai_api_key) and sent in body
+- Typecheck passes, committed
+- Files changed: src/components/ChatPanel.tsx (new)
+- **Learnings for future iterations:**
+  - Split ReadableStream buffer by newlines, keep leftover in buffer across reads
+  - Use a placeholder assistant message upfront so streaming updates last item in-place
+  - `size="icon-sm"` works for the send button (matches NoteList pattern)
+---
+
+## 2026-03-08 - US-010
+- Updated src/app/page.tsx with three-panel layout (NoteList sidebar 280px, Editor center, ChatPanel 360px toggle)
+- Header shows 'Knowledge Base' title, AI Chat toggle button (MessageSquare), and Settings link (gear icon)
+- useNotes() hook wires up notes state; selecting/creating/deleting notes managed in page state
+- Saving a note calls PUT /api/notes/[id] then fire-and-forget POST /api/notes/[id]/embed
+- ChatPanel's onSelectNote finds note by id from notes list and sets it as selected
+- Typecheck passes, committed
+- Files changed: src/app/page.tsx (rewritten)
+- **Learnings for future iterations:**
+  - Fire-and-forget embed: use .catch(() => {}) to suppress unhandled rejection warnings
+  - `setSelectedNote` can use functional updater to merge partial updates from save
+---
+
 ## 2026-03-08 - US-008
 - Installed @tiptap/react @tiptap/starter-kit @tiptap/extension-placeholder
 - Created src/components/Editor.tsx with title input, Tiptap editor, tag input (Enter to add, X to remove)

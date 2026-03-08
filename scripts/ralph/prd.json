@@ -165,7 +165,7 @@
         "Typecheck passes"
       ],
       "priority": 9,
-      "passes": false,
+      "passes": true,
       "notes": "Use fetch with ReadableStream for SSE instead of EventSource (POST request). Parse SSE lines with 'data: ' prefix. Sources arrive after text streaming completes."
     },
     {
@@ -186,7 +186,7 @@
         "Typecheck passes"
       ],
       "priority": 10,
-      "passes": false,
+      "passes": true,
       "notes": "Wire up all state: selectedNoteId, showChat, notes list. The embed call on save is async and fire-and-forget (don't block the save UX). Use Tailwind flex layout for the three panels."
     },
     {
