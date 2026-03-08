@@ -1,0 +1,21 @@
+# Ralph Progress Log
+Started: 2026-03-08
+---
+
+## Codebase Patterns
+- vitest.config MUST use .mts extension — vite 7 dropped CJS support, so vitest.config.ts fails with ERR_REQUIRE_ESM. Always use vitest.config.mts
+- Next.js App Router dynamic route params are now a Promise: `const { id } = await params`
+- SQLite tags stored as JSON string, parsed with JSON.parse on read
+- Import alias `@/` maps to `src/` directory
+- No "type": "module" in package.json — project uses CommonJS default
+- Package manager: npm
+- Test command: npx vitest run (or npm test after adding script)
+- Typecheck command: npx tsc --noEmit
+
+## Project State
+- Task 1 (Project Scaffolding): COMPLETE — Next.js 15, TypeScript, Tailwind v4, shadcn/ui button installed
+- Partial work on Task 2: src/lib/db.ts and src/lib/__tests__/db.test.ts exist but vitest.config.ts has ESM issue
+- vitest and @vitejs/plugin-react installed in devDependencies
+- lucide-react already installed
+- data/ directory exists for SQLite database
+---

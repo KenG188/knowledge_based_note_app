@@ -1,0 +1,258 @@
+{
+  "project": "KnowledgeBaseApp",
+  "branchName": "ralph/knowledge-base-implementation",
+  "description": "Knowledge Base + AI Q&A Web App — SQLite notes with Markdown editor and RAG-powered Claude AI chat",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "SQLite database layer with CRUD operations",
+      "description": "As a developer, I need a database module to persist notes with full CRUD support and a working test suite.",
+      "acceptanceCriteria": [
+        "Delete any existing vitest.config.ts and create vitest.config.mts (ESM-compatible config for vitest 4 + vite 7)",
+        "Add 'test': 'vitest run' script to package.json",
+        "Create src/lib/db.ts with: getDb(), createNote(), getNote(), getAllNotes(), updateNote(), deleteNote(), searchNotes()",
+        "Database creates 3 tables: notes, note_chunks, conversations",
+        "Tags stored as JSON strings in SQLite, returned as string[] in Note type",
+        "Create src/lib/__tests__/db.test.ts with 7 tests covering all CRUD functions",
+        "All 7 tests pass: npx vitest run src/lib/__tests__/db.test.ts",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "vitest.config MUST use .mts extension — vite 7 dropped CJS, so vitest.config.ts fails with ERR_REQUIRE_ESM. Files may already exist from a previous attempt: check src/lib/db.ts and src/lib/__tests__/db.test.ts and vitest.config.ts. If vitest.config.ts exists, delete it and create vitest.config.mts instead. The db module uses a singleton with path-change detection to support testing with different DB_PATH env vars."
+    },
+    {
+      "id": "US-002",
+      "title": "Notes REST API routes (GET, POST, PUT, DELETE)",
+      "description": "As a developer, I need REST API endpoints to manage notes from the frontend.",
+      "acceptanceCriteria": [
+        "Create src/app/api/notes/route.ts: GET (all notes or search with ?q=), POST (create note)",
+        "Create src/app/api/notes/[id]/route.ts: GET (single), PUT (update), DELETE",
+        "GET /api/notes returns all notes as JSON array",
+        "GET /api/notes?q=term returns filtered notes",
+        "POST /api/notes with {title, content, tags} returns created note with status 201",
+        "PUT /api/notes/[id] updates note fields",
+        "DELETE /api/notes/[id] returns {success: true}",
+        "All routes return 404 with error message when note not found",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": "params in Next.js App Router dynamic routes are a Promise: use `const { id } = await params` pattern. Import db functions from @/lib/db."
+    },
+    {
+      "id": "US-003",
+      "title": "Text chunking utility for RAG pipeline",
+      "description": "As a developer, I need a utility to split note content into chunks for embedding and vector search.",
+      "acceptanceCriteria": [
+        "Create src/lib/chunker.ts with chunkText(text, options?) function",
+        "Options: { maxChunkSize?: number, overlap?: number } with defaults 1000 and 100",
+        "Short text (<= maxChunkSize) returns as single chunk",
+        "Long text splits on paragraph boundaries (double newlines) and markdown headers",
+        "No empty chunks produced",
+        "Create src/lib/__tests__/chunker.test.ts with 4 tests",
+        "All 4 tests pass: npx vitest run src/lib/__tests__/chunker.test.ts",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": "Split by /\\n(?=# |\\n)/ regex to handle both paragraph breaks and markdown headers as chunk boundaries."
+    },
+    {
+      "id": "US-004",
+      "title": "Embedding module and RAG vector search",
+      "description": "As a developer, I need OpenAI embedding generation and cosine similarity search to power the RAG pipeline.",
+      "acceptanceCriteria": [
+        "Create src/lib/embedding.ts with getEmbedding(text) and getEmbeddings(texts[]) using OpenAI text-embedding-3-small",
+        "embedding.ts accepts optional apiKey parameter to override env var",
+        "Create src/lib/rag.ts with: cosineSimilarity(), indexNote(noteId, apiKey?), searchSimilar(query, topK, apiKey?)",
+        "indexNote() chunks note content, generates embeddings, stores in note_chunks table as BLOB",
+        "searchSimilar() generates query embedding, compares with stored embeddings, returns top K chunks with note info",
+        "Create src/lib/__tests__/rag.test.ts with 3 tests for cosineSimilarity and vector math (no API calls needed for these unit tests)",
+        "All 3 tests pass: npx vitest run src/lib/__tests__/rag.test.ts",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": "Embeddings stored as Float64Array serialized to Buffer/BLOB in SQLite. cosineSimilarity tests can use static vectors without calling OpenAI API. The API key can come from process.env.OPENAI_API_KEY or a passed parameter."
+    },
+    {
+      "id": "US-005",
+      "title": "Claude AI wrapper and streaming chat API route",
+      "description": "As a developer, I need a Claude API wrapper with streaming and a chat endpoint that uses RAG to answer questions.",
+      "acceptanceCriteria": [
+        "Create src/lib/claude.ts with streamAnswer(question, chunks, apiKey?) async generator that streams text via Anthropic SDK",
+        "streamAnswer() builds context from retrieved chunks and streams Claude's response",
+        "Create src/app/api/chat/route.ts POST endpoint",
+        "Chat route accepts {question, apiKey?, openaiApiKey?} in request body",
+        "Chat route calls searchSimilar() to find relevant chunks",
+        "Chat route streams response as Server-Sent Events (SSE) with text chunks",
+        "SSE format: data: {type: 'text', content: '...'} and data: {type: 'sources', sources: [...]}",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": "Use Anthropic SDK's streaming API. SSE response needs Content-Type: text/event-stream header. Sources should include noteId and noteTitle for citation display."
+    },
+    {
+      "id": "US-006",
+      "title": "Embed API route to index a note",
+      "description": "As a developer, I need an API endpoint to trigger note embedding/indexing for the RAG pipeline.",
+      "acceptanceCriteria": [
+        "Create src/app/api/notes/[id]/embed/route.ts",
+        "POST /api/notes/[id]/embed triggers indexNote() from rag.ts",
+        "Accepts optional {apiKey} in request body to pass OpenAI API key",
+        "Returns {success: true, chunks: number} on success",
+        "Returns 404 if note not found",
+        "Returns 500 with error message on embedding failure",
+        "Typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": "This route enables the frontend to index notes after saving. The apiKey from request body should be passed to indexNote()."
+    },
+    {
+      "id": "US-007",
+      "title": "Note list sidebar component with search and CRUD",
+      "description": "As a user, I want to see all my notes in a sidebar, search them, create new ones, and delete them.",
+      "acceptanceCriteria": [
+        "Create src/lib/hooks.ts with useNotes() custom hook (fetch, create, delete, search notes via API)",
+        "Create src/components/NoteList.tsx component",
+        "NoteList shows search input at top",
+        "NoteList shows 'New Note' button",
+        "NoteList renders list of notes with title, date, and tag badges",
+        "Selected note is highlighted",
+        "Each note item has a delete button (trash icon)",
+        "lucide-react is already installed — use it for icons",
+        "Typecheck passes"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": "lucide-react is already in package.json. shadcn/ui components (Button, Input, Badge, ScrollArea) can be used. The hooks.ts should debounce search queries."
+    },
+    {
+      "id": "US-008",
+      "title": "Markdown editor component with Tiptap",
+      "description": "As a user, I want a rich text editor for my notes with title, content, and tag management.",
+      "acceptanceCriteria": [
+        "Install @tiptap/react @tiptap/starter-kit @tiptap/extension-placeholder",
+        "Create src/components/Editor.tsx component",
+        "Editor has a title input field at the top",
+        "Editor uses Tiptap for markdown content editing",
+        "Editor has tag input that adds tags on Enter key",
+        "Editor shows existing tags as removable badges",
+        "Editor calls onSave(note) callback when Ctrl+S is pressed or Save button clicked",
+        "Editor shows 'last saved' timestamp",
+        "Typecheck passes"
+      ],
+      "priority": 8,
+      "passes": false,
+      "notes": "Tiptap starter-kit includes bold, italic, lists, headings, etc. The onSave prop should accept { title, content, tags } object."
+    },
+    {
+      "id": "US-009",
+      "title": "AI chat panel component with SSE streaming",
+      "description": "As a user, I want to ask questions about my notes and get AI answers with source citations.",
+      "acceptanceCriteria": [
+        "Create src/components/ChatPanel.tsx component",
+        "ChatPanel shows conversation history (user messages and assistant responses)",
+        "ChatPanel has text input and Send button at bottom",
+        "ChatPanel streams responses from /api/chat via EventSource or fetch SSE",
+        "Streaming text appears in real-time as it arrives",
+        "After streaming completes, source notes are displayed as clickable citations",
+        "ChatPanel has loading indicator while waiting for response",
+        "ChatPanel accepts onSelectNote(noteId) callback to navigate to cited notes",
+        "Typecheck passes"
+      ],
+      "priority": 9,
+      "passes": false,
+      "notes": "Use fetch with ReadableStream for SSE instead of EventSource (POST request). Parse SSE lines with 'data: ' prefix. Sources arrive after text streaming completes."
+    },
+    {
+      "id": "US-010",
+      "title": "Main page assembly with three-panel layout",
+      "description": "As a user, I want the app to show a note list sidebar, editor panel, and toggleable AI chat panel.",
+      "acceptanceCriteria": [
+        "Update src/app/page.tsx with three-panel layout",
+        "Left panel: NoteList sidebar (fixed width ~280px)",
+        "Center panel: Editor fills remaining space",
+        "Right panel: ChatPanel toggleable with a button in header",
+        "Header shows app title 'Knowledge Base' and AI Chat toggle button",
+        "Selecting a note in NoteList loads it in Editor",
+        "Creating a note creates via API and selects it",
+        "Saving a note calls PUT /api/notes/[id] then POST /api/notes/[id]/embed",
+        "Deleting a note calls DELETE /api/notes/[id] and clears editor",
+        "Editor shown when a note is selected; placeholder shown otherwise",
+        "Typecheck passes"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": "Wire up all state: selectedNoteId, showChat, notes list. The embed call on save is async and fire-and-forget (don't block the save UX). Use Tailwind flex layout for the three panels."
+    },
+    {
+      "id": "US-011",
+      "title": "Settings page for API key management",
+      "description": "As a user, I want to store my API keys in the browser so the app can call Claude and OpenAI.",
+      "acceptanceCriteria": [
+        "Create src/app/settings/page.tsx",
+        "Settings page has input for Anthropic API key and OpenAI API key",
+        "Keys are saved to localStorage on form submit",
+        "Show/hide password toggle for each key input",
+        "Settings link in main page header (gear icon)",
+        "API keys are read from localStorage and passed in request headers or body to API routes",
+        "Update src/app/api/chat/route.ts to accept apiKey and openaiApiKey from request body",
+        "Update src/app/api/notes/[id]/embed/route.ts to accept apiKey from request body",
+        "Typecheck passes"
+      ],
+      "priority": 11,
+      "passes": false,
+      "notes": "Store keys as 'anthropic_api_key' and 'openai_api_key' in localStorage. The frontend reads these and includes them in fetch request bodies."
+    },
+    {
+      "id": "US-012",
+      "title": "Environment setup and .gitignore updates",
+      "description": "As a developer, I need example environment files and proper .gitignore entries.",
+      "acceptanceCriteria": [
+        "Create .env.local.example with ANTHROPIC_API_KEY and OPENAI_API_KEY placeholder values",
+        "Add *.db to .gitignore if not already present",
+        "Add data/ to .gitignore if not already present",
+        "Typecheck passes"
+      ],
+      "priority": 12,
+      "passes": false,
+      "notes": "Simple housekeeping task. Check existing .gitignore before adding entries."
+    },
+    {
+      "id": "US-013",
+      "title": "Dark/light theme toggle with next-themes",
+      "description": "As a user, I want to switch between dark and light mode.",
+      "acceptanceCriteria": [
+        "Install next-themes",
+        "Create src/components/ThemeProvider.tsx wrapping next-themes ThemeProvider",
+        "Create src/components/ThemeToggle.tsx with sun/moon icon button",
+        "Update src/app/layout.tsx to wrap with ThemeProvider (attribute='class', defaultTheme='system')",
+        "Add ThemeToggle to main page header",
+        "Tailwind dark mode works (add darkMode: 'class' to tailwind config if needed)",
+        "Typecheck passes"
+      ],
+      "priority": 13,
+      "passes": false,
+      "notes": "next-themes works by setting a class on the html element. Tailwind v4 may handle dark mode differently — check tailwind config. Use 'suppressHydrationWarning' on html element in layout.tsx."
+    },
+    {
+      "id": "US-014",
+      "title": "Final integration testing and polish",
+      "description": "As a developer, I want all tests passing and the full workflow working end-to-end.",
+      "acceptanceCriteria": [
+        "Run npx vitest run — all tests pass",
+        "Run npx tsc --noEmit — no type errors",
+        "npm run build succeeds without errors",
+        "All user stories have passes: true in prd.json",
+        "Typecheck passes"
+      ],
+      "priority": 14,
+      "passes": false,
+      "notes": "Fix any remaining type errors or test failures. Focus on making build and typecheck pass cleanly."
+    }
+  ]
+}
