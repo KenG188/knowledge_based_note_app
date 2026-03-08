@@ -37,7 +37,7 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
+      "passes": true,
       "notes": "params in Next.js App Router dynamic routes are a Promise: use `const { id } = await params` pattern. Import db functions from @/lib/db."
     },
     {

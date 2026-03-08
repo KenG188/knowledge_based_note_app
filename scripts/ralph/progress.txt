@@ -31,3 +31,15 @@ Started: 2026-03-08
   - DB singleton persists across tests — must close before deleting test DB file
   - vitest.config.mts works perfectly for ESM
 ---
+
+## 2026-03-08 - US-002
+- Created src/app/api/notes/route.ts: GET (all or search with ?q=), POST (create, status 201)
+- Created src/app/api/notes/[id]/route.ts: GET single, PUT update, DELETE
+- All routes return 404 with error message when note not found
+- Used `const { id } = await params` pattern for Promise params
+- Typecheck passes, committed
+- Files changed: src/app/api/notes/route.ts (new), src/app/api/notes/[id]/route.ts (new)
+- **Learnings for future iterations:**
+  - Dynamic route params destructured as `await params` (Promise in Next.js 15 App Router)
+  - PUT handles partial updates by falling back to existing note fields
+---
