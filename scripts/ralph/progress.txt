@@ -21,6 +21,17 @@ Started: 2026-03-08
 - data/ directory exists for SQLite database
 ---
 
+## 2026-03-08 - US-014
+- Ran npx vitest run — 14 tests pass across 3 test files (db, chunker, rag)
+- Ran npx tsc --noEmit — no type errors
+- Ran npm run build — succeeds cleanly, all routes compiled
+- All user stories have passes: true in prd.json
+- No code changes needed — all previous stories were already clean
+- **Learnings for future iterations:**
+  - Build verifies SSR compatibility; 'use client' on components that use browser APIs is critical
+  - next-themes requires ThemeProvider above all client components; placing in layout.tsx works correctly
+---
+
 ## 2026-03-08 - US-013
 - Installed next-themes
 - Created src/components/ThemeProvider.tsx wrapping NextThemesProvider
