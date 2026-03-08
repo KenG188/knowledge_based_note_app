@@ -9,6 +9,7 @@ import { NoteList } from '@/components/NoteList'
 import { Editor } from '@/components/Editor'
 import { ChatPanel } from '@/components/ChatPanel'
 import { Button } from '@/components/ui/button'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export default function Home() {
   const { notes, searchQuery, setSearchQuery, createNote, deleteNote } = useNotes()
@@ -63,6 +64,7 @@ export default function Home() {
       <header className="flex items-center justify-between px-4 py-2 border-b border-border shrink-0">
         <h1 className="text-base font-semibold">Knowledge Base</h1>
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <Button
             size="icon-sm"
             variant={showChat ? 'default' : 'ghost'}
