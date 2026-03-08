@@ -91,7 +91,7 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
+      "passes": true,
       "notes": "Use Anthropic SDK's streaming API. SSE response needs Content-Type: text/event-stream header. Sources should include noteId and noteTitle for citation display."
     },
     {

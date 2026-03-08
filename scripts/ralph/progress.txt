@@ -68,3 +68,16 @@ Started: 2026-03-08
   - Dynamic route params destructured as `await params` (Promise in Next.js 15 App Router)
   - PUT handles partial updates by falling back to existing note fields
 ---
+
+## 2026-03-08 - US-005
+- Created src/lib/claude.ts with streamAnswer(question, chunks, apiKey?) async generator using Anthropic SDK streaming
+- Created src/app/api/chat/route.ts: POST endpoint, calls searchSimilar() then streams SSE
+- SSE format: `data: {type: 'text', content: '...'}` and `data: {type: 'sources', sources: [...]}`
+- Sources deduplicated by noteId before sending
+- Typecheck passes, committed
+- Files changed: src/lib/claude.ts (new), src/app/api/chat/route.ts (new)
+- **Learnings for future iterations:**
+  - Anthropic SDK streaming: iterate `client.messages.stream()` and check `event.type === 'content_block_delta' && event.delta.type === 'text_delta'`
+  - Use `new ReadableStream` with a `start(controller)` async function to pipe SSE to the HTTP response
+  - Return `new Response(stream, { headers: { 'Content-Type': 'text/event-stream' } })` (not NextResponse) for SSE streams
+---
