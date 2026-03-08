@@ -81,3 +81,13 @@ Started: 2026-03-08
   - Use `new ReadableStream` with a `start(controller)` async function to pipe SSE to the HTTP response
   - Return `new Response(stream, { headers: { 'Content-Type': 'text/event-stream' } })` (not NextResponse) for SSE streams
 ---
+
+## 2026-03-08 - US-006
+- Created src/app/api/notes/[id]/embed/route.ts
+- POST handler: resolves params, checks note exists (404), parses optional apiKey from body, calls indexNote(), returns {success: true, chunks: number}
+- Returns 500 with error message if indexNote() throws
+- Typecheck passes, committed
+- Files changed: src/app/api/notes/[id]/embed/route.ts (new)
+- **Learnings for future iterations:**
+  - Wrap request.json() in try/catch when the body is optional — avoids runtime error on empty body
+---

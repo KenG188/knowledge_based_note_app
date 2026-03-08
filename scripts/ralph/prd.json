@@ -108,7 +108,7 @@
         "Typecheck passes"
       ],
       "priority": 6,
-      "passes": false,
+      "passes": true,
       "notes": "This route enables the frontend to index notes after saving. The apiKey from request body should be passed to indexNote()."
     },
     {
