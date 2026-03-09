@@ -22,6 +22,7 @@ export function Editor({ note, onSave }: EditorProps) {
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
 
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit,
       Placeholder.configure({ placeholder: 'Start writing your note...' }),
