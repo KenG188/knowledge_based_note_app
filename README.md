@@ -1,4 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Knowledge Base — AI-Powered Note Taking App
+
+A personal knowledge base where you write notes in Markdown and ask an AI questions about them. The AI reads your actual notes to answer — not the internet, not generic knowledge, just what you've written.
+
+---
+
+## What It Is
+
+A local-first note taking app that combines a **Markdown editor** with a **RAG-powered AI chat**. All notes are stored in a SQLite database on your machine. The AI (Claude) answers questions by searching through your notes using vector embeddings, so answers are grounded in your own writing.
+
+Think of it as a second brain you can have a conversation with.
+
+---
+
+## What It Does
+
+**Note Management**
+- Create, edit, and delete notes
+- Add tags to organize notes
+- Search notes by title or content (live, debounced)
+- Notes auto-save with `Ctrl+S`
+
+**Markdown Editor**
+- Rich text editing powered by Tiptap
+- Supports headings, bold, italic, lists, and more
+- Title field separate from content
+
+**AI Chat**
+- Ask questions in natural language — "What did I write about React hooks?"
+- Claude reads your notes and answers with context from them
+- Responses stream in real-time, word by word
+- Each answer links back to the source notes it used — click to jump directly to that note
+
+**Theming**
+- Light and dark mode toggle
+- Follows system preference by default
+
+---
+
+## What It Looks Like
+
+The app has a **three-panel layout**:
+
+```
+┌─────────────────┬──────────────────────────┬─────────────────┐
+│   Notes List    │         Editor           │    AI Chat      │
+│                 │                          │                 │
+│  [+ New Note]   │  Note Title              │  AI Chat        │
+│  [Search...]    │  ──────────────────────  │  Ask questions  │
+│                 │  # Heading               │  about your     │
+│  > My Note      │                          │  notes          │
+│    2026-03-08   │  Write your content      │                 │
+│    #tag         │  here in rich text...    │  [You]: What..  │
+│                 │                          │  [AI]: Based on │
+│  > Another Note │                          │  your notes...  │
+│    2026-03-07   │              [Save]      │                 │
+│                 │                          │  Sources:       │
+│                 │                          │  📄 My Note     │
+└─────────────────┴──────────────────────────┴─────────────────┘
+```
+
+- **Left panel** — scrollable list of all notes with search and tags
+- **Center panel** — full Markdown editor with title, tags, and content
+- **Right panel** — AI chat, toggled via the chat icon in the header (hidden by default)
+
+---
+
+## Setup & API Keys
+
+The app works without any API keys — you can create and edit notes freely. API keys are only needed for the AI features:
+
+| Feature | Key needed |
+|---|---|
+| Create / edit / delete notes | None |
+| Search notes | None |
+| AI chat answers | Anthropic API key |
+| Note indexing for AI search | OpenAI API key |
+
+Add keys at the **Settings page** (`/settings`) — they're stored in your browser's localStorage and never sent anywhere except the respective API.
+
+---
+
+## Getting Started
 
 ## Getting Started
 
